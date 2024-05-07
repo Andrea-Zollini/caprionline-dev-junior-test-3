@@ -23,16 +23,16 @@ class MoviesController extends AbstractController
         $movies = $this->movieRepository->findAll();
         $genres = $this->genreRepository->findAll();
 
-        
         $genreNames = [];
         foreach ($genres as $genre) {
-            $genreNames[] = $genre->getName();
+            $genreNames[$genre->getId()] = $genre->getName();
         }
 
         $data = $this->serializer->serialize([
             'movies' => $movies,
             'genres' => $genreNames,
         ], "json", ["groups" => "default"]);
+
 
         return new JsonResponse($data, json: true);
     }
