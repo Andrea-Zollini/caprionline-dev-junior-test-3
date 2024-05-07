@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Button, Rating, Spinner } from 'flowbite-react';
 
 const App = props => {
-  const [movies, setMovies] = useState([]);
+  // const [movies, setMovies] = useState([]);
+  // const [genres, setGenres] = useState([]);
+  const [data, setData] = useState({ movies: [], genres: [] })
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState('');
   const [yearFilter, setYearFilter] = useState(true);
@@ -13,7 +15,10 @@ const App = props => {
     return fetch('http://localhost:8000/movies')
       .then(response => response.json())
       .then(data => {
-        setMovies(data);
+        // setMovies(data);
+        setData(data);
+        // console.log(data);
+        // setGenres(data.genres);
         setLoading(false);
       });
   }
@@ -30,7 +35,11 @@ const App = props => {
     setYearFilter(!yearFilter);
   };
 
-  const filteredMovies = movies.filter((movie) =>
+  const handleGenreChange = (e) => {
+    console.log(e.target.value);
+  }
+
+  const filteredMovies = data.movies.filter((movie) =>
     movie.rating >= (selectedRating || 0)
   );
 
@@ -49,6 +58,7 @@ const App = props => {
       <div className='flex mb-8 lg:mb-16'>
         <Select func={handleYearChange} options={['old', 'recent']} />
         <RatingSelect func={handleRatingChange} />
+        <GenreSelect func={handleGenreChange} genres={data.genres} />
       </div>
       <MovieList loading={loading}>
         {filteredMovies.map((item, key) => (
@@ -106,6 +116,20 @@ const RatingSelect = props => {
         <option value="8">8 and up</option>
       </select>
     </div>
+  )
+}
+
+const GenreSelect = props => {
+  return (
+    <div className="ms-3 max-w-screen-sm text-center">
+      <label htmlFor="genreSel" className='me-3'>Sort by genre:</label>
+      <select id="genreSel" defaultValue={'default'} onChange={props.func}>
+        <option value="default" disabled>Choose a genre</option>
+        {props.genres.map(genre => (
+          <option key={genre}>{genre}</option>
+        ))}
+      </select>
+    </div >
   )
 }
 
