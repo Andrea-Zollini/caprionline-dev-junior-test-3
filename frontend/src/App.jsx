@@ -4,6 +4,7 @@ import { Button, Rating, Spinner } from 'flowbite-react';
 const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('old');
 
   const fetchMovies = () => {
     setLoading(true);
@@ -16,6 +17,10 @@ const App = props => {
       });
   }
 
+  const handleSelectChange = (e) => {
+    console.log(e.target.value);
+  }
+
   useEffect(() => {
     fetchMovies();
   }, []);
@@ -23,7 +28,7 @@ const App = props => {
   return (
     <Layout>
       <Heading />
-
+      <Select func={handleSelectChange} options={['recent', 'old']} />
       <MovieList loading={loading}>
         {movies.map((item, key) => (
           <MovieItem key={key} {...item} />
@@ -57,6 +62,22 @@ const Heading = props => {
   );
 };
 
+const Select = props => {
+  return (
+    <div className="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
+      <label htmlFor="filterSel" className='me-3'>Sort by:</label>
+      <select id="filterSel" onChange={props.func}>
+        {props.options.map(option => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+        {/* <option value="recent">Recent</option>
+        <option value="old">Old</option> */}
+      </select>
+    </div>
+  )
+}
+
+
 const MovieList = props => {
   if (props.loading) {
     return (
@@ -89,19 +110,19 @@ const MovieItem = props => {
         <div className="grow mb-3 last:mb-0">
           {props.year || props.rating
             ? <div className="flex justify-between align-middle text-gray-900 text-xs font-medium mb-2">
-                <span>{props.year}</span>
+              <span>{props.year}</span>
 
-                {props.rating
-                  ? <Rating>
-                      <Rating.Star />
+              {props.rating
+                ? <Rating>
+                  <Rating.Star />
 
-                      <span className="ml-0.5">
-                        {props.rating}
-                      </span>
-                    </Rating>
-                  : null
-                }
-              </div>
+                  <span className="ml-0.5">
+                    {props.rating}
+                  </span>
+                </Rating>
+                : null
+              }
+            </div>
             : null
           }
 
@@ -116,13 +137,13 @@ const MovieItem = props => {
 
         {props.wikipediaUrl
           ? <Button
-              color="light"
-              size="xs"
-              className="w-full"
-              onClick={() => window.open(props.wikipediaUrl, '_blank')}
-            >
-              More
-            </Button>
+            color="light"
+            size="xs"
+            className="w-full"
+            onClick={() => window.open(props.wikipediaUrl, '_blank')}
+          >
+            More
+          </Button>
           : null
         }
       </div>
