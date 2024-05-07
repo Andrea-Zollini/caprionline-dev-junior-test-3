@@ -5,6 +5,7 @@ const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('old');
+  const [filteredMovies, setFilteredMovies] = useState([]);
 
   const fetchMovies = () => {
     setLoading(true);
@@ -18,19 +19,31 @@ const App = props => {
   }
 
   const handleSelectChange = (e) => {
-    console.log(e.target.value);
+    setFilter(e.target.value);
   }
 
   useEffect(() => {
     fetchMovies();
   }, []);
 
+  useEffect(() => {
+    if (filter === 'recent') {
+      setFilteredMovies(
+        [...movies].sort((a, b) => parseInt(b.year) - parseInt(a.year))
+      );
+    } else {
+      setFilteredMovies(
+        [...movies].sort((a, b) => parseInt(a.year) - parseInt(b.year))
+      )
+    }
+  }, [movies, filter]);
+
   return (
     <Layout>
       <Heading />
-      <Select func={handleSelectChange} options={['recent', 'old']} />
+      <Select func={handleSelectChange} options={['old', 'recent']} />
       <MovieList loading={loading}>
-        {movies.map((item, key) => (
+        {filteredMovies.map((item, key) => (
           <MovieItem key={key} {...item} />
         ))}
       </MovieList>
