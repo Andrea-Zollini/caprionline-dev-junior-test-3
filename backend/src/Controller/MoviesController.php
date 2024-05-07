@@ -23,9 +23,12 @@ class MoviesController extends AbstractController
         $movies = $this->movieRepository->findAll();
         $genres = $this->genreRepository->findAll();
 
-        $genreNames = [];
+        $genreObjects = [];
         foreach ($genres as $genre) {
-            $genreNames[$genre->getId()] = $genre->getName();
+            $genreObjects[] = [
+                'id' => $genre->getId(),
+                'name' => $genre->getName(),
+            ];
         }
 
         $data = $this->serializer->serialize([

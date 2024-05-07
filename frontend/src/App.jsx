@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button, Rating, Spinner } from 'flowbite-react';
 
 const App = props => {
-  // const [movies, setMovies] = useState([]);
-  // const [genres, setGenres] = useState([]);
   const [data, setData] = useState({ movies: [], genres: [] })
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState('');
@@ -15,10 +13,7 @@ const App = props => {
     return fetch('http://localhost:8000/movies')
       .then(response => response.json())
       .then(data => {
-        // setMovies(data);
         setData(data);
-        // console.log(data);
-        // setGenres(data.genres);
         setLoading(false);
       });
   }
@@ -126,7 +121,7 @@ const GenreSelect = props => {
       <select id="genreSel" defaultValue={'default'} onChange={props.func}>
         <option value="default" disabled>Choose a genre</option>
         {props.genres.map(genre => (
-          <option key={genre}>{genre}</option>
+          <option key={genre.id}>{genre.name}</option>
         ))}
       </select>
     </div >
