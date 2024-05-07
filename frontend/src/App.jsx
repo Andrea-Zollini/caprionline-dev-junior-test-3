@@ -4,8 +4,8 @@ import { Button, Rating, Spinner } from 'flowbite-react';
 const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('old');
-  const [filteredMovies, setFilteredMovies] = useState([]);
+  const [selectedRating, setSelectedRating] = useState('');
+  const [yearFilter, setYearFilter] = useState(true);
 
   const fetchMovies = () => {
     setLoading(true);
@@ -18,30 +18,38 @@ const App = props => {
       });
   }
 
-  const handleSelectChange = (e) => {
-    setFilter(e.target.value);
-  }
-
   useEffect(() => {
     fetchMovies();
   }, []);
 
-  useEffect(() => {
-    if (filter === 'recent') {
-      setFilteredMovies(
-        [...movies].sort((a, b) => parseInt(b.year) - parseInt(a.year))
-      );
+  const handleRatingChange = (event) => {
+    setSelectedRating(event.target.value);
+  };
+
+  const handleYearChange = () => {
+    setYearFilter(!yearFilter);
+  };
+
+  const filteredMovies = movies.filter((movie) =>
+    movie.rating >= (selectedRating || 0)
+  );
+
+  filteredMovies.sort((movie1, movie2) => {
+    if (yearFilter) {
+      return movie1.year - movie2.year;
     } else {
-      setFilteredMovies(
-        [...movies].sort((a, b) => parseInt(a.year) - parseInt(b.year))
-      )
+      return movie2.year - movie1.year;
     }
-  }, [movies, filter]);
+  });
+
 
   return (
     <Layout>
       <Heading />
-      <Select func={handleSelectChange} options={['old', 'recent']} />
+      <div className='flex mb-8 lg:mb-16'>
+        <Select func={handleYearChange} options={['old', 'recent']} />
+        <RatingSelect func={handleRatingChange} />
+      </div>
       <MovieList loading={loading}>
         {filteredMovies.map((item, key) => (
           <MovieItem key={key} {...item} />
@@ -77,14 +85,25 @@ const Heading = props => {
 
 const Select = props => {
   return (
-    <div className="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
-      <label htmlFor="filterSel" className='me-3'>Sort by:</label>
+    <div className="max-w-screen-sm text-center">
+      <label htmlFor="filterSel" className='me-3'>Sort by year:</label>
       <select id="filterSel" onChange={props.func}>
         {props.options.map(option => (
           <option key={option} value={option}>{option}</option>
         ))}
-        {/* <option value="recent">Recent</option>
-        <option value="old">Old</option> */}
+      </select>
+    </div>
+  )
+}
+
+const RatingSelect = props => {
+  return (
+    <div className="ms-3 max-w-screen-sm text-center">
+      <label htmlFor="ratingSel" className='me-3'>Sort by rating:</label>
+      <select id="ratingSel" onChange={props.func}>
+        <option value="0">All</option>
+        <option value="5">5 and up</option>
+        <option value="8">8 and up</option>
       </select>
     </div>
   )
