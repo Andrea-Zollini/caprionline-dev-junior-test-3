@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\MovieRepository;
 use App\Repository\GenreRepository;
+use App\Repository\MovieGenreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,7 +15,7 @@ class MoviesController extends AbstractController
     public function __construct(
         private MovieRepository $movieRepository,
         private GenreRepository $genreRepository,
-        private SerializerInterface $serializer
+        private SerializerInterface $serializer,
     ) {}
 
     #[Route('/movies', methods: ['GET'])]
@@ -31,11 +32,25 @@ class MoviesController extends AbstractController
             ];
         }
 
+        $movies_genres = [];
+        foreach($movies as $movie) {
+            $genresData = [];
+
+            $genres = $movie->getMovieGenres();
+            foreach($genres as $movieGenre) {
+                $genre = $movieGenre->getGenre();
+                $genreName = $genre->getName();
+                $genresData[] = $genreName;
+            }
+
+            $movies_genres[$movie->getId()] = $genresData;
+        }
+
         $data = $this->serializer->serialize([
             'movies' => $movies,
-            'genres' => $genreNames,
+            'genres' => $genreObjects,
+            'movies_genres' => $movies_genres,
         ], "json", ["groups" => "default"]);
-
 
         return new JsonResponse($data, json: true);
     }
