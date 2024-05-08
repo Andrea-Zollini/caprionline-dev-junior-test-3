@@ -66,16 +66,20 @@ const App = props => {
   return (
     <Layout>
       <Heading />
-      <div className='flex mb-8 lg:mb-16'>
+      <div className='flex mx-auto justify-center mb-8 lg:mb-16'>
         <Select func={handleSortByYear} options={['old', 'recent']} />
         <RatingSelect func={handleSortByRating} />
         <GenreSelect func={handleGenreChange} genres={data.genres} />
       </div>
-      <MovieList loading={loading}>
-        {filteredMovies.map((item, key) => (
-          <MovieItem key={key} {...item} />
-        ))}
-      </MovieList>
+      {filteredMovies.length > 0 ? (
+        <MovieList loading={loading}>
+          {filteredMovies.map((item, key) => (
+            <MovieItem key={key} {...item} />
+          ))}
+        </MovieList>
+      ) : (
+        <Message />
+      )}
     </Layout>
   );
 };
@@ -141,6 +145,14 @@ const GenreSelect = props => {
         ))}
       </select>
     </div >
+  )
+}
+
+const Message = () => {
+  return (
+    <div className="mx-auto max-w-screen-sm text-center">
+      <p>No movies found.</p>
+    </div>
   )
 }
 
