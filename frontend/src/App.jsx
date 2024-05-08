@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Rating, Spinner } from 'flowbite-react';
 
 const App = props => {
-  const [data, setData] = useState({ movies: [], genres: [] })
+  const [data, setData] = useState({ movies: [], genres: [], movies_genres: [] })
   const [loading, setLoading] = useState(true);
   const [selectedRating, setSelectedRating] = useState('');
   const [yearFilter, setYearFilter] = useState(true);
@@ -34,7 +34,14 @@ const App = props => {
     console.log(e.target.value);
   }
 
-  const filteredMovies = data.movies.filter((movie) =>
+  const filteredMovies = data.movies.map(movie => ({
+    ...movie,
+    genres: data.movies_genres[movie.id]
+  }));
+
+  console.log(filteredMovies);
+
+  filteredMovies.filter((movie) =>
     movie.rating >= (selectedRating || 0)
   );
 
