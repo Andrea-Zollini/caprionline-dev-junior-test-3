@@ -4,8 +4,9 @@ import { Button, Rating, Spinner } from 'flowbite-react';
 const App = props => {
   const [data, setData] = useState({ movies: [], genres: [], movies_genres: [] })
   const [loading, setLoading] = useState(true);
-  const [selectedRating, setSelectedRating] = useState('');
-  const [yearFilter, setYearFilter] = useState(true);
+  const [sortByYear, setSortByYear] = useState(null);
+  const [sortByRating, setSortByRating] = useState(null);
+  const [filterByGenre, setFilterByGenre] = useState(null);
 
   const fetchMovies = () => {
     setLoading(true);
@@ -22,44 +23,52 @@ const App = props => {
     fetchMovies();
   }, []);
 
-  const handleRatingChange = (event) => {
-    setSelectedRating(event.target.value);
+  const moviesWithGenres = data.movies.map(movie => ({
+    ...movie,
+    genres: data.movies_genres[movie.id] || []
+  }));
+
+  const handleSortByRating = (event) => {
+    setSortByRating(event.target.value);
   };
 
-  const handleYearChange = () => {
-    setYearFilter(!yearFilter);
+  const handleSortByYear = () => {
+    setSortByYear(!sortByYear);
   };
 
   const handleGenreChange = (e) => {
-    console.log(e.target.value);
+    setFilterByGenre(e.target.value);
   }
 
-  const filteredMovies = data.movies.map(movie => ({
-    ...movie,
-    genres: data.movies_genres[movie.id]
-  }));
+  let filteredMovies = [...moviesWithGenres];
 
-  console.log(filteredMovies);
+  if (sortByYear) {
+    filteredMovies.sort((a, b) => {
+      return sortByYear === 'recent' ? a.year - b.year : b.year - a.year;
+    });
+  }
 
-  filteredMovies.filter((movie) =>
-    movie.rating >= (selectedRating || 0)
-  );
-
-  filteredMovies.sort((movie1, movie2) => {
-    if (yearFilter) {
-      return movie1.year - movie2.year;
-    } else {
-      return movie2.year - movie1.year;
+  if (sortByRating) {
+    if (sortByRating === '5') {
+      filteredMovies = filteredMovies.filter(movie => movie.rating >= 5);
+    } else if (sortByRating === '8') {
+      filteredMovies = filteredMovies.filter(movie => movie.rating >= 8);
     }
-  });
+  }
+
+  if (filterByGenre) {
+    filteredMovies = filteredMovies.filter(movie => {
+      return movie.genres.includes(filterByGenre);
+    });
+  }
 
 
   return (
     <Layout>
       <Heading />
       <div className='flex mb-8 lg:mb-16'>
-        <Select func={handleYearChange} options={['old', 'recent']} />
-        <RatingSelect func={handleRatingChange} />
+        <Select func={handleSortByYear} options={['old', 'recent']} />
+        <RatingSelect func={handleSortByRating} />
         <GenreSelect func={handleGenreChange} genres={data.genres} />
       </div>
       <MovieList loading={loading}>
